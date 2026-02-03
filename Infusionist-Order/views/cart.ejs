@@ -1,0 +1,67 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart | Infusionist</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-black text-white font-sans">
+    <header class="p-6 flex justify-between items-center border-b border-zinc-800 sticky top-0 bg-black/90 backdrop-blur-md z-50">
+        <a href="/" class="text-2xl font-bold tracking-tighter text-red-600 no-underline">INFUSIONIST</a>
+        <a href="/" class="text-zinc-400 text-sm hover:text-white transition-colors">Back to Menu</a>
+    </header>
+
+    <main class="container mx-auto px-6 py-12 max-w-4xl">
+        <h2 class="text-4xl font-bold mb-12 text-center">Your Cart</h2>
+
+        <% if (items.length === 0) { %>
+            <div class="text-center py-24 bg-zinc-900/30 rounded-2xl border border-zinc-800">
+                <p class="text-zinc-500 mb-8">Your cart is as empty as a rushed marinade.</p>
+                <a href="/" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-lg transition-colors inline-block">
+                    Explore Menu
+                </a>
+            </div>
+        <% } else { %>
+            <div class="grid grid-cols-1 gap-6 mb-12">
+                <% items.forEach(item => { %>
+                    <div class="bg-zinc-900/50 border border-zinc-800 p-6 rounded-2xl flex items-center gap-6">
+                        <img src="<%= item.imageUrl %>" class="w-24 h-24 object-cover rounded-xl border border-zinc-800">
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold"><%= item.name %></h3>
+                            <p class="text-zinc-500 text-sm">$<%= item.price.toFixed(2) %> each</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-mono text-red-500 font-bold text-lg">x<%= item.quantity %></p>
+                            <p class="text-zinc-400 text-sm">$<%= (item.price * item.quantity).toFixed(2) %></p>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+
+            <div class="bg-zinc-900 p-8 rounded-2xl border border-zinc-800">
+                <div class="flex justify-between items-center mb-8 pb-8 border-b border-zinc-800">
+                    <span class="text-zinc-400">Total Amount</span>
+                    <span class="text-3xl font-bold text-red-500 font-mono">$<%= total.toFixed(2) %></span>
+                </div>
+
+                <form action="/checkout" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <h4 class="text-lg font-bold mb-4">Delivery Details</h4>
+                        <input type="text" name="name" placeholder="Full Name" required class="w-full bg-black border border-zinc-800 rounded-lg p-3 text-sm focus:border-red-600 outline-none transition-colors">
+                        <input type="tel" name="phone" placeholder="Phone Number" required class="w-full bg-black border border-zinc-800 rounded-lg p-3 text-sm focus:border-red-600 outline-none transition-colors">
+                    </div>
+                    <div class="space-y-4">
+                        <h4 class="text-lg font-bold mb-4 opacity-0">Address</h4>
+                        <textarea name="address" placeholder="Delivery Address in Bangalore" required rows="3" class="w-full bg-black border border-zinc-800 rounded-lg p-3 text-sm focus:border-red-600 outline-none transition-colors"></textarea>
+                        <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-lg transition-all uppercase tracking-widest text-sm shadow-lg shadow-red-900/20 active:scale-[0.98]">
+                            Place Order
+                        </button>
+                    </div>
+                </form>
+            </div>
+        <% } %>
+    </main>
+</body>
+</html>

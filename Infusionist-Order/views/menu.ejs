@@ -1,0 +1,87 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu | Infusionist</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-black text-white font-sans">
+    <header class="p-6 flex justify-between items-center border-b border-zinc-800 sticky top-0 bg-black/90 backdrop-blur-md z-50">
+        <h1 class="text-2xl font-bold tracking-tighter text-red-600">INFUSIONIST</h1>
+        <div class="flex items-center gap-4">
+            <a href="/cart" class="bg-zinc-900 px-4 py-2 rounded-full border border-zinc-800 text-sm no-underline text-white hover:border-red-600 transition-colors">
+                Cart: <span class="text-red-500 font-bold"><%= cartCount %></span> items
+            </a>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+        <div class="mb-12 text-center">
+            <h2 class="text-4xl font-bold mb-4 tracking-tight">Our Menu</h2>
+            <p class="text-zinc-500 max-w-xl mx-auto">Precision-infused chicken, crafted with patience in Bangalore.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <% items.forEach(item => { %>
+                <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl overflow-hidden hover:border-red-600/50 transition-all duration-300 group">
+                    <div class="h-64 overflow-hidden relative">
+                        <img src="<%= item.imageUrl %>" alt="<%= item.name %>" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold"><%= item.name %></h3>
+                            <span class="text-red-500 font-mono font-bold">$<%= item.price.toFixed(2) %></span>
+                        </div>
+                        <p class="text-zinc-500 text-sm mb-4 leading-relaxed h-12 overflow-hidden">
+                            <%= item.description %>
+                        </p>
+                        
+                        <div class="mb-4 bg-zinc-950 p-3 rounded-lg border border-zinc-800 hidden" id="ai-pairing-<%= item.id %>">
+                            <p class="text-[10px] uppercase tracking-widest text-red-500 font-bold mb-1">Chef's Recommendation</p>
+                            <p class="text-zinc-400 text-[11px] leading-snug italic" id="ai-text-<%= item.id %>"></p>
+                        </div>
+
+                        <form action="/cart/add" method="POST">
+                            <input type="hidden" name="productId" value="<%= item.id %>">
+                            <div class="flex gap-2 mb-2">
+                                <input type="number" name="quantity" value="1" min="1" class="w-20 bg-black border border-zinc-800 rounded-lg p-2 text-center text-sm focus:border-red-600 outline-none transition-colors">
+                                <button type="submit" class="flex-1 bg-red-600 hover:bg-red-700 active:scale-95 text-white font-bold py-2 rounded-lg transition-all text-sm uppercase tracking-wider">
+                                    Add to Cart
+                                </button>
+                            </div>
+                            <button type="button" onclick="getPairing(<%= item.id %>)" class="w-full text-[10px] uppercase tracking-widest text-zinc-500 hover:text-red-500 transition-colors py-1">
+                                Ask AI Chef for Pairing
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+    </main>
+
+    <script>
+        async function getPairing(id) {
+            const el = document.getElementById(`ai-pairing-${id}`);
+            const textEl = document.getElementById(`ai-text-${id}`);
+            
+            el.classList.remove('hidden');
+            textEl.innerText = "Consulting the kitchen...";
+            
+            try {
+                const res = await fetch(`/api/ai/pairing?productId=${id}`);
+                const data = await res.json();
+                textEl.innerText = data.suggestion || "An artisan cola pairs perfectly with this infusion.";
+            } catch (e) {
+                textEl.innerText = "Chef is busy, but we recommend our Honey Glazed Wings.";
+            }
+        }
+    </script>
+
+    <footer class="p-12 text-center border-t border-zinc-800 text-zinc-600 text-[10px] uppercase tracking-[0.2em]">
+        <p>© 2024 INFUSIONIST - BANGALORE. A CONCEPT BY THE MESSY APRON.</p>
+    </footer>
+</body>
+</html>
