@@ -5,12 +5,13 @@ import { CheckCircle2, Clock, ChefHat, Truck, MessageCircle, Sparkles } from "lu
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { config } from "@/lib/config";
 
 export default function OrderSuccess() {
   const { id } = useParams();
   const [showConfetti, setShowConfetti] = useState(true);
 
-  const whatsappNumber = "919876543210";
+  const whatsappNumber = config.whatsappNumber;
   const whatsappMessage = encodeURIComponent(`Hi! I'd like to track my order #${id}`);
 
   useEffect(() => {

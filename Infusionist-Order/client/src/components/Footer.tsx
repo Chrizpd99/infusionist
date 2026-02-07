@@ -1,8 +1,9 @@
 import { Link } from "wouter";
 import { Instagram, MessageCircle, Mail, MapPin, Lock, ArrowUpRight } from "lucide-react";
+import { config } from "@/lib/config";
 
 export function Footer() {
-  const whatsappNumber = "919876543210";
+  const whatsappNumber = config.whatsappNumber;
   const whatsappMessage = encodeURIComponent("Hi! I'd like to place an order with Infusionist.");
 
   const currentYear = new Date().getFullYear();

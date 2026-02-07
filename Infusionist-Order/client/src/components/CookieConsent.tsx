@@ -19,16 +19,22 @@ export function CookieConsent() {
     try {
       localStorage.setItem(CONSENT_KEY, JSON.stringify({ marketing: true, analytics: true, timestamp: Date.now() }));
       // notify server (non-blocking)
-      fetch('/api/consent', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ marketing: true, analytics: true }) }).catch(() => {});
-    } catch (e) {}
+      fetch('/api/consent', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ marketing: true, analytics: true }) })
+        .catch((err) => console.warn('Failed to send consent to server:', err));
+    } catch (e) {
+      console.warn('Failed to save consent:', e);
+    }
     setVisible(false);
   };
 
   const acceptEssential = async () => {
     try {
       localStorage.setItem(CONSENT_KEY, JSON.stringify({ marketing: false, analytics: false, timestamp: Date.now() }));
-      fetch('/api/consent', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ marketing: false, analytics: false }) }).catch(() => {});
-    } catch (e) {}
+      fetch('/api/consent', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ marketing: false, analytics: false }) })
+        .catch((err) => console.warn('Failed to send consent to server:', err));
+    } catch (e) {
+      console.warn('Failed to save consent:', e);
+    }
     setVisible(false);
   };
 

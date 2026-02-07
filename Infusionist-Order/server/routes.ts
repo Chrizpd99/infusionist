@@ -7,7 +7,7 @@ import { z } from "zod";
 import bcrypt from "bcryptjs";
 import session from "express-session";
 import helmet from "helmet";
-import { PublicUser, selectUserSchema } from "@shared/schema";
+// PublicUser type used via api.auth.me.responses
 import { log } from "./index";
 
 // Razorpay removed - orders are finalized immediately on creation.
@@ -29,7 +29,7 @@ export async function registerRoutes(
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+        scriptSrc: ["'self'", "'unsafe-inline'"], // Note: unsafe-inline needed for Vite HMR in dev
         styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
         fontSrc: ["'self'", "https://fonts.gstatic.com"],
         imgSrc: ["'self'", "data:", "blob:", "https://images.unsplash.com", "https://*.unsplash.com"],
@@ -48,7 +48,13 @@ export async function registerRoutes(
 
   app.use(
     session({
-      secret: process.env.SESSION_SECRET || "supersecret", // Use a strong, random secret from environment variables
+      secret: process.env.SESSION_SECRET || (() => {
+        if (process.env.NODE_ENV === "production") {
+          throw new Error("SESSION_SECRET environment variable is required in production");
+        }
+        console.warn("⚠️  Using default session secret. Set SESSION_SECRET in production!");
+        return "dev-secret-change-in-production";
+      })(),
       resave: false,
       saveUninitialized: false,
       cookie: {
@@ -694,13 +700,22 @@ async function seedDatabase() {
 }
 
 async function seedAdminUser() {
-  const adminEmail = "infusionist.messyapron@gmail.com";
-  const existingAdmin = await storage.findUserByEmail(adminEmail);
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminPassword = process.env.ADMIN_PASSWORD;
 
+  // Skip seeding if admin credentials not provided
+  if (!adminEmail || !adminPassword) {
+    if (process.env.NODE_ENV === "production") {
+      log("No ADMIN_EMAIL/ADMIN_PASSWORD set - skipping admin seed", "db");
+    }
+    return;
+  }
+
+  const existingAdmin = await storage.findUserByEmail(adminEmail);
   if (existingAdmin) return;
 
   log("Seeding admin user...", "db");
-  const passwordHash = await bcrypt.hash("Cheeka@123", 10);
+  const passwordHash = await bcrypt.hash(adminPassword, 10);
   await storage.createUser({
     email: adminEmail,
     passwordHash,

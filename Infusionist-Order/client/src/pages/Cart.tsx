@@ -16,6 +16,7 @@ import { useState, useEffect } from "react";
 import { PromoCodeInput } from "@/components/PromoCodeInput";
 import { SpecialInstructions } from "@/components/SpecialInstructions";
 import { OrderSummaryModal } from "@/components/OrderSummaryModal";
+import { config } from "@/lib/config";
 
 
 const formSchema = z.object({
@@ -59,7 +60,7 @@ export default function Cart() {
   // Calculate delivery charges
   useEffect(() => {
     const cartTotal = total();
-    setDeliveryCharges(cartTotal >= 500 ? 0 : 60);
+    setDeliveryCharges(cartTotal >= config.freeDeliveryThreshold ? 0 : config.deliveryCharge);
   }, [total()]);
 
   const handlePromoApply = (code: string, discount: number) => {
